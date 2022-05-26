@@ -41,7 +41,11 @@ void tarefa_6(void);
 void tarefa_7(void);
 void tarefa_8(void);
 
-void tarefa_3_modificada(void);
+/*codigo novo*/
+void tarefa_produtor(void);
+void tarefa_consumidor(void);
+uint8_t produz(void);
+void consome(uint8_t *buffer);
 
 /*
  * Configuracao dos tamanhos das pilhas
@@ -79,9 +83,9 @@ int main(void)
 	/* Criacao das tarefas */
 	/* Parametros: ponteiro, nome, ponteiro da pilha, tamanho da pilha, prioridade da tarefa */
 	
-	 CriaTarefa(tarefa_1, "Tarefa 1", PILHA_TAREFA_1, TAM_PILHA_1, 2);
+	 CriaTarefa(tarefa_produtor, "Tarefa 1", PILHA_TAREFA_1, TAM_PILHA_1, 2);
 	
-	 CriaTarefa(tarefa_2, "Tarefa 2", PILHA_TAREFA_2, TAM_PILHA_2, 1);
+	 CriaTarefa(tarefa_consumidor, "Tarefa 2", PILHA_TAREFA_2, TAM_PILHA_2, 1);
 	
 	//CriaTarefa(tarefa_3, "Tarefa 3", PILHA_TAREFA_3, TAM_PILHA_3, 3);
 		
@@ -108,7 +112,7 @@ void tarefa_1(void)
 	{
 		a++;
 		port_pin_set_output_level(LED_0_PIN, LED_0_ACTIVE); /* Liga LED. */
-		TarefaEspera(10);
+		TarefaEspera(1000);
 		//TarefaContinua(2);
 	
 	}
@@ -122,7 +126,7 @@ void tarefa_2(void)
 		b++;
 		//TarefaSuspende(2);	
 		port_pin_set_output_level(LED_0_PIN, !LED_0_ACTIVE); 	/* Turn LED off. */
-		//TarefaEspera(1000);
+		TarefaEspera(1000);
 		
 	}
 }
@@ -199,6 +203,8 @@ void tarefa_6(void)
 /* soluçao com buffer compartihado */
 /* Tarefas de exemplo que usam funcoes de semaforo */
 
+int N = 10; // codigo novo
+
 #define TAM_BUFFER 10
 uint8_t buffer[TAM_BUFFER]; /* declaracao de um buffer (vetor) ou fila circular */
 
@@ -253,4 +259,44 @@ void tarefa_8(void)
 		
 		SemaforoLibera(&SemaforoVazio);
 	}
+}
+
+
+/*codigo novo*/
+void tarefa_produtor(void){
+	uint8_t f = 0;
+	
+	for(;;){
+		TarefaEspera(5*1000);
+		port_pin_set_output_level(LED_0_PIN, LED_0_ACTIVE); /* Liga LED. */
+		
+		SemaforoAguarda(&SemaforoVazio);
+		f = (f+1) % N;
+		buffer[f] = produz();
+		SemaforoLibera(&SemaforoCheio);
+	}	
+}
+
+void tarefa_consumidor(void){
+		uint8_t i = 0;
+		for(;;){
+			TarefaEspera(5*1000);
+			port_pin_set_output_level(LED_0_PIN, !LED_0_ACTIVE); 	/* Turn LED off. */
+			SemaforoAguarda(&SemaforoCheio);
+			i = (i+1) % N;
+			consome(&buffer[i]);
+			SemaforoLibera(&SemaforoVazio); 
+		}	
+}
+
+uint8_t k = 0;
+uint8_t produz(void){
+	if(k < N) 
+		return k++;
+	else
+		k = 0;
+}
+
+void consome(uint8_t *buffer){
+	*buffer = 0;	
 }
