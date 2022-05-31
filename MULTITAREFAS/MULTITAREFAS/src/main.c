@@ -41,11 +41,8 @@ void tarefa_6(void);
 void tarefa_7(void);
 void tarefa_8(void);
 
-/*codigo novo*/
-void tarefa_produtor(void);
-void tarefa_consumidor(void);
-uint8_t produz(void);
-void consome(uint8_t *buffer);
+
+
 
 /*
  * Configuracao dos tamanhos das pilhas
@@ -83,11 +80,20 @@ int main(void)
 	/* Criacao das tarefas */
 	/* Parametros: ponteiro, nome, ponteiro da pilha, tamanho da pilha, prioridade da tarefa */
 	
-	 CriaTarefa(tarefa_produtor, "Tarefa 1", PILHA_TAREFA_1, TAM_PILHA_1, 2);
+	CriaTarefa(tarefa_1, "Tarefa 1", PILHA_TAREFA_1, TAM_PILHA_1, 5);
 	
-	 CriaTarefa(tarefa_consumidor, "Tarefa 2", PILHA_TAREFA_2, TAM_PILHA_2, 1);
+	CriaTarefa(tarefa_2, "Tarefa 2", PILHA_TAREFA_2, TAM_PILHA_2, 4);
 	
-	//CriaTarefa(tarefa_3, "Tarefa 3", PILHA_TAREFA_3, TAM_PILHA_3, 3);
+	CriaTarefa(tarefa_3, "Tarefa 3", PILHA_TAREFA_3, TAM_PILHA_3, 3);
+	
+	CriaTarefa(tarefa_4, "Tarefa 4", PILHA_TAREFA_4, TAM_PILHA_4, 2);
+	
+	CriaTarefa(tarefa_5, "Tarefa 5", PILHA_TAREFA_5, TAM_PILHA_5, 1);
+	
+	CriaTarefa(tarefa_6, "Tarefa 6", PILHA_TAREFA_6, TAM_PILHA_6, 6);
+	
+		
+	
 		
 	/* Cria tarefa ociosa do sistema */
 	CriaTarefa(tarefa_ociosa,"Tarefa ociosa", PILHA_TAREFA_OCIOSA, TAM_PILHA_OCIOSA, 0);
@@ -96,7 +102,7 @@ int main(void)
 	ConfiguraMarcaTempo();   
 	
 	/* Inicia sistema multitarefas */
-	IniciaMultitarefas();
+;	IniciaMultitarefas();
 	
 	/* Nunca chega aqui */
 	while (1)
@@ -105,198 +111,109 @@ int main(void)
 }
 
 /* Tarefas de exemplo que usam funcoes para suspender/continuar as tarefas */
+ uint32_t cont_1 = 0;
+/* Tarefas de exemplo que usam funcoes para suspender/continuar as tarefas */
 void tarefa_1(void)
 {
-	volatile uint16_t a = 0;
-	for(;;)
-	{
-		a++;
-		port_pin_set_output_level(LED_0_PIN, LED_0_ACTIVE); /* Liga LED. */
-		TarefaEspera(1000);
-		//TarefaContinua(2);
+	 
 	
+	for (;;)
+	{
+		cont_1++;
+		TarefaSuspende(1);
+		
+	   
+	   
 	}
 }
+
+uint32_t cont_2 = 0;
 
 void tarefa_2(void)
 {
-	volatile uint16_t b = 0;
-	for(;;)
-	{
-		b++;
-		//TarefaSuspende(2);	
-		port_pin_set_output_level(LED_0_PIN, !LED_0_ACTIVE); 	/* Turn LED off. */
-		TarefaEspera(1000);
-		
-	}
+	 
+	 
+	 for (;;)
+	 {
+		 cont_2++;
+		 
+		 TarefaContinua(1);
+		 TarefaSuspende(2);
+		 
+		 
+		 
+		 
+	 }
 }
 
-/* Tarefas de exemplo que usam funcoes para suspender as tarefas por algum tempo (atraso/delay) */
+uint32_t cont_3 = 0;
+
 void tarefa_3(void)
 {
-	volatile uint16_t a = 0;
-	for(;;)
-	{
-		a++;	
-			
-		/* Liga LED. */
-		port_pin_set_output_level(LED_0_PIN, LED_0_ACTIVE);
-		TarefaEspera(1000*5); 	/* tarefa 1 se coloca em espera por 3 marcas de tempo (ticks) */
+
+	 
+	 for (;;)
+	 {
+		 cont_3++;
+	    TarefaContinua(2);
+		TarefaSuspende(3);
 		
-		/* Desliga LED. */
-		port_pin_set_output_level(LED_0_PIN, !LED_0_ACTIVE);
-		TarefaEspera(1000*5); 	/* tarefa 1 se coloca em espera por 3 marcas de tempo (ticks) */
-		
-		
-	}
+		 
+	 }
 }
 
+
+uint32_t cont_4 = 0;
 
 void tarefa_4(void)
 {
-	volatile uint16_t b = 0;
-	for(;;)
+
+	
+	for (;;)
 	{
-		b++;
+		cont_4++;
+		TarefaContinua(3);
+		TarefaSuspende(4);
 		
-		TarefaEspera(5);	/* tarefa se coloca em espera por 5 marcas de tempo (ticks) */
+		
 	}
 }
 
-/* Tarefas de exemplo que usam funcoes de semaforo */
 
-semaforo_t SemaforoTeste = {0,0}; /* declaracao e inicializacao de um semaforo */
+uint32_t cont_5 = 0;
 
 void tarefa_5(void)
 {
-
-	uint32_t a = 0;			/* inicializações para a tarefa */
 	
-	for(;;)
-	{
-		
-		a++;				/* código exemplo da tarefa */
-
-		TarefaEspera(3); 	/* tarefa se coloca em espera por 3 marcas de tempo (ticks) */
-		
-		SemaforoLibera(&SemaforoTeste); /* tarefa libera semaforo para tarefa que esta esperando-o */
-		
-	}
+for (;;)
+{
+	cont_5++;
+	TarefaContinua(4);
+	
+	
+}
+	
 }
 
-/* Exemplo de tarefa que usa semaforo */
+
+
 void tarefa_6(void)
 {
-	
-	uint32_t b = 0;	    /* inicializações para a tarefa */
-	
-	for(;;)
-	{
-		
-		b++; 			/* código exemplo da tarefa */
-		
-		SemaforoAguarda(&SemaforoTeste); /* tarefa se coloca em espera por semaforo */
 
-	}
-}
+static uint32_t total = 0;
 
-/* soluçao com buffer compartihado */
-/* Tarefas de exemplo que usam funcoes de semaforo */
-
-int N = 10; // codigo novo
-
-#define TAM_BUFFER 10
-uint8_t buffer[TAM_BUFFER]; /* declaracao de um buffer (vetor) ou fila circular */
-
-semaforo_t SemaforoCheio = {0,0}; /* declaracao e inicializacao de um semaforo */
-semaforo_t SemaforoVazio = {TAM_BUFFER,0}; /* declaracao e inicializacao de um semaforo */
-
-void tarefa_7(void)
+for (;;)
 {
-
-	uint8_t a = 1;			/* inicializações para a tarefa */
-	uint8_t i = 0;
+	TarefaSuspende(1);
+	TarefaSuspende(2);
+	TarefaSuspende(3);
+	TarefaSuspende(4);
+	TarefaEspera(1000);
+	total = cont_1 + cont_2 + cont_3 + cont_4 + cont_5; 
 	
-	for(;;)
-	{
-		SemaforoAguarda(&SemaforoVazio);
-		
-		buffer[i] = a++;
-		i = (i+1)%TAM_BUFFER;
-		
-		SemaforoLibera(&SemaforoCheio); /* tarefa libera semaforo para tarefa que esta esperando-o */
-		
-		TarefaEspera(10); 	/* tarefa se coloca em espera por 10 marcas de tempo (ticks), equivale a 10ms */		
-	}
 }
-
-/* Exemplo de tarefa que usa semaforo */
-void tarefa_8(void)
-{
-	static uint8_t f = 0;
-	volatile uint8_t valor;
-		
-	for(;;)
-	{
-		volatile uint8_t contador;
-		
-		do{
-			REG_ATOMICA_INICIO();			
-				contador = SemaforoCheio.contador;			
-			REG_ATOMICA_FIM();
-			
-			if (contador == 0)
-			{
-				TarefaEspera(100);
-			}
-				
-		} while (!contador);
-		
-		SemaforoAguarda(&SemaforoCheio);
-		
-		valor = buffer[f];
-		f = (f+1) % TAM_BUFFER;		
-		
-		SemaforoLibera(&SemaforoVazio);
-	}
-}
-
-
-/*codigo novo*/
-void tarefa_produtor(void){
-	uint8_t f = 0;
 	
-	for(;;){
-		TarefaEspera(5*1000);
-		port_pin_set_output_level(LED_0_PIN, LED_0_ACTIVE); /* Liga LED. */
-		
-		SemaforoAguarda(&SemaforoVazio);
-		f = (f+1) % N;
-		buffer[f] = produz();
-		SemaforoLibera(&SemaforoCheio);
-	}	
 }
 
-void tarefa_consumidor(void){
-		uint8_t i = 0;
-		for(;;){
-			TarefaEspera(5*1000);
-			port_pin_set_output_level(LED_0_PIN, !LED_0_ACTIVE); 	/* Turn LED off. */
-			SemaforoAguarda(&SemaforoCheio);
-			i = (i+1) % N;
-			consome(&buffer[i]);
-			SemaforoLibera(&SemaforoVazio); 
-		}	
-}
 
-uint8_t k = 0;
-uint8_t produz(void){
-	if(k < N) 
-		return k++;
-	else
-		k = 0;
-}
 
-void consome(uint8_t *buffer){
-	*buffer = 0;	
-}
